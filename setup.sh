@@ -43,42 +43,42 @@ minikube start --memory="${MEMORY:-12288}" --cpus="${CPUS:-4}" --kubernetes-vers
 header_text "Waiting for core k8s services to initialize"
 sleep 5; while echo && kubectl get pods -n kube-system | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
 
-header_text "Strimzi install"
-kubectl create namespace kafka
-curl -L "https://github.com/strimzi/strimzi-kafka-operator/releases/download/${strimzi_version}/strimzi-cluster-operator-${strimzi_version}.yaml" \
-  | sed 's/namespace: .*/namespace: kafka/' \
-  | kubectl -n kafka apply -f -
+# header_text "Strimzi install"
+# kubectl create namespace kafka
+# curl -L "https://github.com/strimzi/strimzi-kafka-operator/releases/download/${strimzi_version}/strimzi-cluster-operator-${strimzi_version}.yaml" \
+#   | sed 's/namespace: .*/namespace: kafka/' \
+#   | kubectl -n kafka apply -f -
 
-header_text "Applying Strimzi Cluster file"
-kubectl -n kafka apply -f "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/${strimzi_version}/examples/kafka/kafka-persistent-single.yaml"
-header_text "Waiting for Strimzi to become ready"
-sleep 5; while echo && kubectl get pods -n kafka | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
+# header_text "Applying Strimzi Cluster file"
+# kubectl -n kafka apply -f "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/${strimzi_version}/examples/kafka/kafka-persistent-single.yaml"
+# header_text "Waiting for Strimzi to become ready"
+# sleep 5; while echo && kubectl get pods -n kafka | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
 
-header_text "Setting up istio"
-kubectl apply --filename "https://github.com/knative/serving/releases/download/${istio_version}/istio-crds.yaml" &&
-    curl -L "https://github.com/knative/serving/releases/download/${istio_version}/istio.yaml" \
-        | sed 's/LoadBalancer/NodePort/' \
-        | kubectl apply --filename -
+# header_text "Setting up istio"
+# kubectl apply --filename "https://github.com/knative/serving/releases/download/${istio_version}/istio-crds.yaml" &&
+#     curl -L "https://github.com/knative/serving/releases/download/${istio_version}/istio.yaml" \
+#         | sed 's/LoadBalancer/NodePort/' \
+#         | kubectl apply --filename -
 
-# Label the default namespace with istio-injection=enabled.
-header_text "Labeling default namespace w/ istio-injection=enabled"
-kubectl label namespace default istio-injection=enabled
-header_text "Waiting for istio to become ready"
-sleep 5; while echo && kubectl get pods -n istio-system | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
+# # Label the default namespace with istio-injection=enabled.
+# header_text "Labeling default namespace w/ istio-injection=enabled"
+# kubectl label namespace default istio-injection=enabled
+# header_text "Waiting for istio to become ready"
+# sleep 5; while echo && kubectl get pods -n istio-system | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
 
-header_text "Setting up Knative Serving"
-curl -L "https://github.com/knative/serving/releases/download/${serving_version}/serving.yaml" \
-  | sed 's/LoadBalancer/NodePort/' \
-  | kubectl apply --filename -
+# header_text "Setting up Knative Serving"
+# curl -L "https://github.com/knative/serving/releases/download/${serving_version}/serving.yaml" \
+#   | sed 's/LoadBalancer/NodePort/' \
+#   | kubectl apply --filename -
 
-header_text "Waiting for Knative Serving to become ready"
-sleep 5; while echo && kubectl get pods -n knative-serving | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
+# header_text "Waiting for Knative Serving to become ready"
+# sleep 5; while echo && kubectl get pods -n knative-serving | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
 
 
-header_text "Setting up Knative Eventing"
-kubectl apply --filename https://github.com/knative/eventing/releases/download/${eventing_version}/release.yaml
-kubectl apply --filename https://github.com/knative/eventing-sources/releases/download/${eventing_sources_version}/eventing-sources.yaml
+# header_text "Setting up Knative Eventing"
+# kubectl apply --filename https://github.com/knative/eventing/releases/download/${eventing_version}/release.yaml
+# kubectl apply --filename https://github.com/knative/eventing-sources/releases/download/${eventing_sources_version}/eventing-sources.yaml
 
-header_text "Waiting for Knative Eventing to become ready"
-sleep 5; while echo && kubectl get pods -n knative-eventing | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
-sleep 5; while echo && kubectl get pods -n knative-sources | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
+# header_text "Waiting for Knative Eventing to become ready"
+# sleep 5; while echo && kubectl get pods -n knative-eventing | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
+# sleep 5; while echo && kubectl get pods -n knative-sources | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
