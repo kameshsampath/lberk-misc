@@ -43,6 +43,17 @@ minikube start --memory="${MEMORY:-12288}" --cpus="${CPUS:-4}" --kubernetes-vers
 header_text "Waiting for core k8s services to initialize"
 sleep 5; while echo && kubectl get pods -n kube-system | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
 
+header_text "OLM install"
+kubectl apply -f https://gist.githubusercontent.com/matzew/730041878eb29a21a62262807946b844/raw/7be00dd56005bd4590dc541c6273e8e4e44a7991/olm.yaml
+sleep 5; while echo && kubectl get pods -n olm | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
+
+kubectl apply -f https://gist.githubusercontent.com/matzew/730041878eb29a21a62262807946b844/raw/7be00dd56005bd4590dc541c6273e8e4e44a7991/olm.yaml
+sleep 5; while echo && kubectl get pods -n olm | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
+
+kubectl apply -f https://gist.githubusercontent.com/matzew/730041878eb29a21a62262807946b844/raw/7be00dd56005bd4590dc541c6273e8e4e44a7991/olm.yaml
+sleep 5; while echo && kubectl get pods -n olm | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
+
+
 # header_text "Strimzi install"
 # kubectl create namespace kafka
 # curl -L "https://github.com/strimzi/strimzi-kafka-operator/releases/download/${strimzi_version}/strimzi-cluster-operator-${strimzi_version}.yaml" \
