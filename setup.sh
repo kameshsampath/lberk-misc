@@ -16,9 +16,9 @@ else
 fi
 
 strimzi_version=`curl https://github.com/strimzi/strimzi-kafka-operator/releases/latest |  awk -F 'tag/' '{print $2}' | awk -F '"' '{print $1}' 2>/dev/null`
-serving_version="0.6.0"
-eventing_version="0.6.0"
-eventing_sources_version="0.6.0"
+serving_version="v0.6.0"
+eventing_version="v0.6.0"
+eventing_sources_version="v0.6.0"
 istio_version="1.0.7"
 kube_version="v1.12.1"
 
