@@ -16,10 +16,10 @@ else
 fi
 
 strimzi_version=`curl https://github.com/strimzi/strimzi-kafka-operator/releases/latest |  awk -F 'tag/' '{print $2}' | awk -F '"' '{print $1}' 2>/dev/null`
-serving_version="0.4.1"
-eventing_version="0.4.1"
-eventing_sources_version="0.4.1"
-istio_version="v0.4.0"
+serving_version="0.6.0"
+eventing_version="0.6.0"
+eventing_sources_version="0.6.0"
+istio_version=""
 kube_version="v1.12.1"
 
 MEMORY="$(minikube config view | awk '/memory/ { print $3 }')"
@@ -55,8 +55,8 @@ header_text "Waiting for Strimzi to become ready"
 sleep 5; while echo && kubectl get pods -n kafka | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
 
 header_text "Setting up istio"
-kubectl apply --filename "https://github.com/knative/serving/releases/download/${istio_version}/istio-crds.yaml" &&
-    curl -L "https://github.com/knative/serving/releases/download/${istio_version}/istio.yaml" \
+kubectl apply --filename "https://raw.githubusercontent.com/knative/serving/v0.5.2/third_party/istio-1.0.7/istio-crds.yaml" &&
+    curl -L "https://raw.githubusercontent.com/knative/serving/v0.5.2/third_party/istio-1.0.7/istio.yaml" \
         | sed 's/LoadBalancer/NodePort/' \
         | kubectl apply --filename -
 
