@@ -15,12 +15,8 @@ else
   reset=''
 fi
 
-strimzi_version=`curl https://github.com/strimzi/strimzi-kafka-operator/releases/latest |  awk -F 'tag/' '{print $2}' | awk -F '"' '{print $1}' 2>/dev/null`
-serving_version="v0.5.1"
-eventing_version="v0.5.0"
-eventing_sources_version="v0.5.0"
-istio_version=${serving_version}
-kube_version="v1.12.1"
+olm_version="0.10.0"
+kube_version="v1.13.4"
 
 MEMORY="$(minikube config view | awk '/memory/ { print $3 }')"
 CPUS="$(minikube config view | awk '/cpus/ { print $3 }')"
@@ -31,65 +27,15 @@ function header_text {
   echo "$header$*$reset"
 }
 
-header_text             "Starting Knative on minikube!"
+header_text             "Starting OLM on minikube!"
 header_text "Using Kubernetes Version:               ${kube_version}"
-header_text "Using Strimzi Version:                  ${strimzi_version}"
-header_text "Using Knative Serving Version:          ${serving_version}"
-header_text "Using Knative Eventing Version:         ${eventing_version}"
-header_text "Using Knative Eventing Sources Version: ${eventing_sources_version}"
-header_text "Using Istio Version:                    ${istio_version}"
+header_text "Using OLM Version:                      ${olm_version}"
 
 minikube start --memory="${MEMORY:-12288}" --cpus="${CPUS:-4}" --kubernetes-version="${kube_version}" --vm-driver="${DRIVER:-kvm2}" --disk-size="${DISKSIZE:-30g}" --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook"
 header_text "Waiting for core k8s services to initialize"
 sleep 5; while echo && kubectl get pods -n kube-system | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
 
 header_text "OLM install"
-kubectl apply -f https://gist.githubusercontent.com/matzew/730041878eb29a21a62262807946b844/raw/7be00dd56005bd4590dc541c6273e8e4e44a7991/olm.yaml
+kubectl apply -f https://github.com/operator-framework/operator-lifecycle-manager/releases/download/${olm_version}/crds.yaml
+kubectl apply -f https://github.com/operator-framework/operator-lifecycle-manager/releases/download/${olm_version}/olm.yaml
 sleep 5; while echo && kubectl get pods -n olm | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
-
-kubectl apply -f https://gist.githubusercontent.com/matzew/730041878eb29a21a62262807946b844/raw/7be00dd56005bd4590dc541c6273e8e4e44a7991/olm.yaml
-sleep 5; while echo && kubectl get pods -n olm | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
-
-kubectl apply -f https://gist.githubusercontent.com/matzew/730041878eb29a21a62262807946b844/raw/7be00dd56005bd4590dc541c6273e8e4e44a7991/olm.yaml
-sleep 5; while echo && kubectl get pods -n olm | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
-
-
-# header_text "Strimzi install"
-# kubectl create namespace kafka
-# curl -L "https://github.com/strimzi/strimzi-kafka-operator/releases/download/${strimzi_version}/strimzi-cluster-operator-${strimzi_version}.yaml" \
-#   | sed 's/namespace: .*/namespace: kafka/' \
-#   | kubectl -n kafka apply -f -
-
-# header_text "Applying Strimzi Cluster file"
-# kubectl -n kafka apply -f "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/${strimzi_version}/examples/kafka/kafka-persistent-single.yaml"
-# header_text "Waiting for Strimzi to become ready"
-# sleep 5; while echo && kubectl get pods -n kafka | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
-
-# header_text "Setting up istio"
-# kubectl apply --filename "https://github.com/knative/serving/releases/download/${istio_version}/istio-crds.yaml" &&
-#     curl -L "https://github.com/knative/serving/releases/download/${istio_version}/istio.yaml" \
-#         | sed 's/LoadBalancer/NodePort/' \
-#         | kubectl apply --filename -
-
-# # Label the default namespace with istio-injection=enabled.
-# header_text "Labeling default namespace w/ istio-injection=enabled"
-# kubectl label namespace default istio-injection=enabled
-# header_text "Waiting for istio to become ready"
-# sleep 5; while echo && kubectl get pods -n istio-system | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
-
-# header_text "Setting up Knative Serving"
-# curl -L "https://github.com/knative/serving/releases/download/${serving_version}/serving.yaml" \
-#   | sed 's/LoadBalancer/NodePort/' \
-#   | kubectl apply --filename -
-
-# header_text "Waiting for Knative Serving to become ready"
-# sleep 5; while echo && kubectl get pods -n knative-serving | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
-
-
-# header_text "Setting up Knative Eventing"
-# kubectl apply --filename https://github.com/knative/eventing/releases/download/${eventing_version}/release.yaml
-# kubectl apply --filename https://github.com/knative/eventing-sources/releases/download/${eventing_sources_version}/eventing-sources.yaml
-
-# header_text "Waiting for Knative Eventing to become ready"
-# sleep 5; while echo && kubectl get pods -n knative-eventing | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
-# sleep 5; while echo && kubectl get pods -n knative-sources | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
