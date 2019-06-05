@@ -19,8 +19,8 @@ serving_version="v0.6.0"
 eventing_version="v0.6.0"
 eventing_sources_version="v0.6.0"
 istio_version="1.0.7"
-kube_version="v1.12.1"
-#kube_version="v1.13.4"
+#kube_version="v1.12.1"
+kube_version="v1.13.4"
 
 MEMORY="$(minikube config view | awk '/memory/ { print $3 }')"
 CPUS="$(minikube config view | awk '/cpus/ { print $3 }')"
@@ -64,7 +64,8 @@ sleep 5; while echo && kubectl get pods -n knative-serving | grep -v -E "(Runnin
 
 
 header_text "Setting up Knative Eventing"
-kubectl apply --filename https://github.com/knative/eventing/releases/download/${eventing_version}/release.yaml
+#kubectl apply --filename https://github.com/knative/eventing/releases/download/${eventing_version}/release.yaml
+kubectl apply --filename https://storage.googleapis.com/knative-nightly/eventing/latest/release.yaml
 
 header_text "Waiting for Knative Eventing to become ready"
 sleep 5; while echo && kubectl get pods -n knative-eventing | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
