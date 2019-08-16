@@ -52,15 +52,15 @@ header_text "Using Istio Version:                    ${istio_version}"
 # header_text "Waiting for Strimzi to become ready"
 # sleep 5; while echo && kubectl get pods -n kafka | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
 
-header_text "Setting up Istio lean"
-# kubectl apply --filename "https://raw.githubusercontent.com/knative/serving/${serving_version}/third_party/istio-${istio_version}/istio-crds.yaml" &&
-#     curl -L "https://raw.githubusercontent.com/knative/serving/${serving_version}/third_party/istio-${istio_version}/istio.yaml" \
-#         | sed 's/LoadBalancer/NodePort/' \
-#         | kubectl apply --filename -
+# header_text "Setting up Istio lean"
+# # kubectl apply --filename "https://raw.githubusercontent.com/knative/serving/${serving_version}/third_party/istio-${istio_version}/istio-crds.yaml" &&
+# #     curl -L "https://raw.githubusercontent.com/knative/serving/${serving_version}/third_party/istio-${istio_version}/istio.yaml" \
+# #         | sed 's/LoadBalancer/NodePort/' \
+# #         | kubectl apply --filename -
 
-curl -L "https://raw.githubusercontent.com/knative/serving/${serving_version}/third_party/istio-${istio_version}/istio-lean.yaml" \
-    | sed 's/LoadBalancer/NodePort/' \
-    | kubectl apply --filename -
+# curl -L "https://raw.githubusercontent.com/knative/serving/${serving_version}/third_party/istio-${istio_version}/istio-lean.yaml" \
+#     | sed 's/LoadBalancer/NodePort/' \
+#     | kubectl apply --filename -
 
 
 # # Label the default namespace with istio-injection=enabled.

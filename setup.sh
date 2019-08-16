@@ -57,7 +57,8 @@ header_text "Setting up Istio"
 #     curl -L "https://raw.githubusercontent.com/knative/serving/${serving_version}/third_party/istio-${istio_version}/istio.yaml" \
 #         | sed 's/LoadBalancer/NodePort/' \
 #         | kubectl apply --filename -
-curl -L "https://raw.githubusercontent.com/knative/serving/${serving_version}/third_party/istio-${istio_version}/istio-lean.yaml" \
+### curl -L "https://raw.githubusercontent.com/knative/serving/${serving_version}/third_party/istio-${istio_version}/istio-lean.yaml" \
+curl -L "https://gist.githubusercontent.com/matzew/8772d5095a93b04d1de6f07319db4ba9/raw/afd20d5b342cb2f7ddccb532ea0f19f431bebe79/matzew-istio-lean.yaml" \
     | sed 's/LoadBalancer/NodePort/' \
     | kubectl apply --filename -
 
