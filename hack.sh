@@ -16,8 +16,8 @@ else
 fi
 
 strimzi_version=`curl https://github.com/strimzi/strimzi-kafka-operator/releases/latest |  awk -F 'tag/' '{print $2}' | awk -F '"' '{print $1}' 2>/dev/null`
-serving_version="v0.8.0"
-eventing_version="v0.8.0"
+serving_version="v0.9.0"
+eventing_version="v0.9.0"
 istio_version="1.1.7"
 kube_version="v1.13.4"
 
@@ -79,8 +79,14 @@ sleep 5; while echo && kubectl get pods -n knative-serving | grep -v -E "(Runnin
 
 
 header_text "Setting up Knative Eventing"
-#kubectl apply --filename https://github.com/knative/eventing/releases/download/${eventing_version}/release.yaml
-kubectl apply --filename https://storage.googleapis.com/knative-nightly/eventing/latest/release.yaml
+kubectl apply --filename https://github.com/knative/eventing/releases/download/${eventing_version}/release.yaml
+#kubectl apply --filename https://storage.googleapis.com/knative-nightly/eventing/latest/release.yaml
 
 header_text "Waiting for Knative Eventing to become ready"
 sleep 5; while echo && kubectl get pods -n knative-eventing | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
+
+header_text "Setting up Knative Kafka Source"
+kubectl apply --filename https://github.com/knative/eventing-contrib/releases/download/v0.9.0/kafka-source.yaml
+
+header_text "Waiting for Knative Kafka Source to become ready"
+sleep 5; while echo && kubectl get pods -n knative-sources | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
