@@ -71,9 +71,14 @@ header_text "Waiting for istio to become ready"
 sleep 5; while echo && kubectl get pods -n istio-system | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
 
 header_text "Setting up Knative Serving"
-curl -L "https://github.com/knative/serving/releases/download/${serving_version}/serving.yaml" \
-  | sed 's/LoadBalancer/NodePort/' \
-  | kubectl apply --filename -
+
+ n=0
+   until [ $n -ge 2 ]
+   do
+      kubectl apply --filename https://github.com/knative/serving/releases/download/${serving_version}/serving.yaml && break
+      n=$[$n+1]
+      sleep 5
+   done
 
 header_text "Waiting for Knative Serving to become ready"
 sleep 5; while echo && kubectl get pods -n knative-serving | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
