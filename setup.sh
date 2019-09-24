@@ -92,7 +92,7 @@ header_text "Waiting for Knative Eventing to become ready"
 sleep 5; while echo && kubectl get pods -n knative-eventing | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
 
 header_text "Setting up Knative Kafka Source"
-kubectl apply --filename https://github.com/knative/eventing-contrib/releases/download/v0.9.0/kafka-source.yaml
+kubectl apply --filename https://github.com/knative/eventing-contrib/releases/download/v0.8.2/kafka-importer.yaml
 
 header_text "Waiting for Knative Kafka Source to become ready"
 sleep 5; while echo && kubectl get pods -n knative-sources | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
