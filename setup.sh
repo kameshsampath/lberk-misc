@@ -16,10 +16,10 @@ else
 fi
 
 strimzi_version=`curl https://github.com/strimzi/strimzi-kafka-operator/releases/latest |  awk -F 'tag/' '{print $2}' | awk -F '"' '{print $1}' 2>/dev/null`
-serving_version="v0.9.0"
-eventing_version="v0.9.0"
-istio_version="1.1.7"
-kube_version="v1.14.7"
+serving_version="v0.10.0"
+eventing_version="v0.10.0"
+istio_version="1.3.3"
+kube_version="v1.16.0"
 
 MEMORY="$(minikube config view | awk '/memory/ { print $3 }')"
 CPUS="$(minikube config view | awk '/cpus/ { print $3 }')"
@@ -57,8 +57,8 @@ header_text "Setting up Istio"
 #     curl -L "https://raw.githubusercontent.com/knative/serving/${serving_version}/third_party/istio-${istio_version}/istio.yaml" \
 #         | sed 's/LoadBalancer/NodePort/' \
 #         | kubectl apply --filename -
-### curl -L "https://raw.githubusercontent.com/knative/serving/${serving_version}/third_party/istio-${istio_version}/istio-lean.yaml" \
-curl -L "https://gist.githubusercontent.com/matzew/8772d5095a93b04d1de6f07319db4ba9/raw/afd20d5b342cb2f7ddccb532ea0f19f431bebe79/matzew-istio-lean.yaml" \
+###curl -L "https://gist.githubusercontent.com/matzew/8772d5095a93b04d1de6f07319db4ba9/raw/afd20d5b342cb2f7ddccb532ea0f19f431bebe79/matzew-istio-lean.yaml" \
+curl -L "https://raw.githubusercontent.com/knative/serving/${serving_version}/third_party/istio-${istio_version}/istio-lean.yaml" \
     | sed 's/LoadBalancer/NodePort/' \
     | kubectl apply --filename -
 
@@ -84,15 +84,16 @@ header_text "Waiting for Knative Serving to become ready"
 sleep 5; while echo && kubectl get pods -n knative-serving | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
 
 
-header_text "Setting up Knative Eventing"
+# header_text "Setting up Knative Eventing"
 kubectl apply --filename https://github.com/knative/eventing/releases/download/${eventing_version}/release.yaml
-#kubectl apply --filename https://storage.googleapis.com/knative-nightly/eventing/latest/release.yaml
+# kubectl apply --filename https://storage.googleapis.com/knative-nightly/eventing/latest/release.yaml
 
 header_text "Waiting for Knative Eventing to become ready"
 sleep 5; while echo && kubectl get pods -n knative-eventing | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
 
-header_text "Setting up Knative Kafka Source"
-kubectl apply --filename https://github.com/knative/eventing-contrib/releases/download/v0.9.0/kafka-source.yaml
+# header_text "Setting up Knative Apache Kafka Source"
+# kubectl apply --filename https://github.com/knative/eventing-contrib/releases/download/v0.9.0/kafka-source.yaml
+# kubectl apply --filename https://storage.googleapis.com/knative-nightly/eventing-contrib/latest/kafka-source.yaml
 
-header_text "Waiting for Knative Kafka Source to become ready"
-sleep 5; while echo && kubectl get pods -n knative-sources | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
+# header_text "Waiting for Knative Apache Kafka Source to become ready"
+# sleep 5; while echo && kubectl get pods -n knative-sources | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
