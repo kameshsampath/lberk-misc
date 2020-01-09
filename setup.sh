@@ -20,7 +20,7 @@ strimzi_version=`curl https://github.com/strimzi/strimzi-kafka-operator/releases
 serving_version="v0.11.0"
 eventing_version="v0.11.0"
 eventing_contrib_version="v0.11.1"
-camel_version="v0.10.3"
+camel_version="v0.11.2"
 istio_version="1.3.5"
 kube_version="v1.14.7"
 
@@ -86,12 +86,25 @@ header_text "Waiting for Strimzi to become ready"
 sleep 5; while echo && kubectl get pods -n kafka | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
 
 header_text "Setting up Istio"
-cd /tmp 
+
+pushd /tmp > /dev/null
+
 export ISTIO_VERSION="${istio_version}"
+
 curl -L https://git.io/getLatestIstio | sh -
-cd istio-${ISTIO_VERSION}
-for i in install/kubernetes/helm/istio-init/files/crd*yaml; do kubectl apply -f $i; done
-cat <<-EOF | kubectl apply -f -
+
+pushd istio-${ISTIO_VERSION} > /dev/null
+
+header_text "Creating Istio Custom Resource Definitions(CRD)"
+
+for i in install/kubernetes/helm/istio-init/files/crd*yaml;
+do
+  kubectl apply -f $i;
+done
+
+header_text "Creating istio-system namespace"
+
+cat <<EOF | kubectl apply -f -
 ---
 apiVersion: v1
 kind: Namespace
@@ -101,6 +114,9 @@ metadata:
     istio-injection: disabled
 spec: {}
 EOF
+
+header_text "Deploying Istio components"
+
 helm template --namespace=istio-system \
   --set prometheus.enabled=false \
   --set mixer.enabled=false \
@@ -147,6 +163,9 @@ kubectl apply -f istio-local-gateway.yaml
 header_text "Waiting for Istio to become ready"
 sleep 5; while echo && kubectl get pods -n istio-system | grep -v -E "(Running|Completed|STATUS)"; do sleep 5; done
 
+header_text "Istio successfully installed"
+
+popd > /dev/null && popd > /dev/null
 
 header_text "Setting up Knative Serving"
 
